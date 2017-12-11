@@ -3,11 +3,19 @@
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
 Rails.application.config.content_security_policy do |p|
+
   p.default_src :self, :https
   p.font_src    :self, :https, :data
   p.img_src     :self, :https, :data
   p.object_src  :none
-  p.script_src  :self, :https
+
+  if Rails.env.development?
+    p.connect_src :self, :https, 'ws://localhost:3035', 'http://localhost:3035'
+    p.script_src  :self, :https, :unsafe_eval, :unsafe_inline
+  else
+    p.script_src  :self, :https
+  end
+
   p.style_src   :self, :https, :unsafe_inline
 
   # Specify URI for violation reports
